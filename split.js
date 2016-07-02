@@ -189,16 +189,27 @@ var global = this
             var computedStyle = global.getComputedStyle(this.parent)
               , parentSize = this.parent[clientDimension] - parseFloat(computedStyle[paddingA]) - parseFloat(computedStyle[paddingB])
 
-            this.size = this.a[getBoundingClientRect]()[dimension] + this.b[getBoundingClientRect]()[dimension] + this.aGutterSize + this.bGutterSize
+            // Not floating?
+            if (this.b !== 'undefined') {
+                this.size = this.a[getBoundingClientRect]()[dimension] + this.b[getBoundingClientRect]()[dimension] + this.aGutterSize + this.bGutterSize
+            }
+            else {
+                this.size = this.a[getBoundingClientRect]()[dimension] + this.aGutterSize
+            }
             this.percentage = Math.min(this.size / parentSize * 100, 100)
             this.start = this.a[getBoundingClientRect]()[position]
         }
       , adjust = function (offset) {
             // A size is the same as offset. B size is total size - A size.
             // Both sizes are calculated from the initial parent percentage.
-
-            this.a.style[dimension] = calc + '(' + (offset / this.size * this.percentage) + '% - ' + this.aGutterSize + 'px)'
-            this.b.style[dimension] = calc + '(' + (this.percentage - (offset / this.size * this.percentage)) + '% - ' + this.bGutterSize + 'px)'
+            if (!this.aFloating) {
+                this.a.style[dimension] = calc + '(' + (offset / this.size * this.percentage) + '% - ' + this.aGutterSize + 'px)'
+                this.b.style[dimension] = calc + '(' + (this.percentage - (offset / this.size * this.percentage)) + '% - ' + this.bGutterSize + 'px)'
+            }
+            else {
+                this.a.style[dimension] = calc + '(' + (offset / this.size * this.percentage) + '% - ' + this.aGutterSize + 'px)'
+                this.gutter.style[position] = this.a.style[dimension]
+            }
         }
       , fitMin = function () {
             var self = this
@@ -239,6 +250,15 @@ var global = this
         }
       , preventSelection = function () { return false }
       , parent = elementOrSelector(ids[0]).parentNode
+      , isFloating = function (id) {
+        if (options.floating) {
+            var index = options.floating.indexOf(id);
+            if (index >= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     if (!options.sizes) {
         var percent = 100 / ids.length
@@ -274,6 +294,8 @@ var global = this
                 b: el,
                 aMin: options.minSize[i - 1],
                 bMin: options.minSize[i],
+                aFloating: isFloating(ids[i - 1].id),
+                bFloating: isFloating(ids[i].id),
                 dragging: false,
                 parent: parent,
                 isFirst: isFirst,
@@ -302,6 +324,11 @@ var global = this
 
                 gutter.className = gutterClass
                 gutter.style[dimension] = options.gutterSize + 'px'
+
+                if (pair.aFloating) {
+                    gutter.style[position] = pair.a.style[dimension]
+                    gutter.className += ' gutter-floating';
+                }
 
                 gutter[addEventListener]('mousedown', startDragging.bind(pair))
                 gutter[addEventListener]('touchstart', startDragging.bind(pair))
