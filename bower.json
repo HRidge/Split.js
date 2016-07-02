@@ -1,10 +1,10 @@
 {
   "name": "Split.js",
   "main": "split.js",
-  "version": "1.0.6",
-  "homepage": "https://github.com/nathancahill/Split.js",
+  "version": "1.0.7",
+  "homepage": "https://github.com/HRidge/Split.js",
   "authors": [
-    "Nathan Cahill <nathan@nathancahill.com>"
+    "Harri Harju <harri.harju@modularmanagement.com>"
   ],
   "description": "A lightweight utility for creating adjustable split views",
   "keywords": [
