@@ -37,6 +37,7 @@ var global = this
       , clientDimension
       , clientAxis
       , position
+      , gutterParentClass
       , gutterClass
       , paddingA
       , paddingB
@@ -56,6 +57,7 @@ var global = this
         clientDimension = 'clientWidth'
         clientAxis = 'clientX'
         position = 'left'
+        gutterParentClass = 'gutter-parent gutter-parent-horizontal'
         gutterClass = 'gutter gutter-horizontal'
         paddingA = 'paddingLeft'
         paddingB = 'paddingRight'
@@ -65,6 +67,7 @@ var global = this
         clientDimension = 'clientHeight'
         clientAxis = 'clientY'
         position = 'top'
+        gutterParentClass = 'gutter-parent gutter-parent-vertical'
         gutterClass = 'gutter gutter-vertical'
         paddingA = 'paddingTop'
         paddingB = 'paddingBottom'
@@ -305,42 +308,45 @@ var global = this
 
             // For first and last pairs, first and last gutter width is half.
 
-            pair.aGutterSize = options.gutterSize
-            pair.bGutterSize = options.gutterSize
+            pair.aGutterSize = 0 //options.gutterSize
+            pair.bGutterSize = 0 //options.gutterSize
 
-            if (isFirst) {
-                pair.aGutterSize = options.gutterSize / 2
-            }
+            //if (isFirst) {
+            //    pair.aGutterSize = options.gutterSize / 2
+            //}
 
-            if (isLast) {
-                pair.bGutterSize = options.gutterSize / 2
-            }
+            //if (isLast) {
+            //    pair.bGutterSize = options.gutterSize / 2
+            //}
         }
 
         // IE9 and above
         if (!isIE8) {
             if (i > 0) {
+                var gutterParent = document.createElement('div')
+                gutterParent.className = gutterParentClass
+
                 var gutter = document.createElement('div')
-
                 gutter.className = gutterClass
-                gutter.style[dimension] = options.gutterSize + 'px'
-
-                if (pair.aFloating) {
-                    gutter.style[position] = pair.a.style[dimension]
-                    gutter.className += ' gutter-floating';
+                if (i == ids.length - 1) {
+                    gutter.style[position] = "-" + (options.gutterSize + 2) + 'px'
                 }
+                gutter.style[dimension] = options.gutterSize + 'px'
 
                 gutter[addEventListener]('mousedown', startDragging.bind(pair))
                 gutter[addEventListener]('touchstart', startDragging.bind(pair))
 
-                parent.insertBefore(gutter, el)
+                gutterParent.appendChild(gutter)
+                parent.insertBefore(gutterParent, el)
 
                 pair.gutter = gutter
             }
 
-            if (i === 0 || i == ids.length - 1) {
-                gutterSize = options.gutterSize / 2
-            }
+            gutterSize = 0
+
+            //if (i === 0 || i == ids.length - 1) {
+            //    gutterSize = options.gutterSize / 2
+            //}
 
             if (typeof options.sizes[i] === 'string' || options.sizes[i] instanceof String) {
                 size = options.sizes[i]
